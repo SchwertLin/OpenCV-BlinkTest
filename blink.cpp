@@ -13,125 +13,125 @@ using namespace std;
 using namespace dlib;
 using namespace cv;
 
-//´æ´¢ÑÛ¾¦µÄÉÏÒ»¸öµãµÄ×ø±ê
-int eye_pre_x = 20;					//Ô­µãºá×ø±ê
-int eye_pre_y = 400;				//Ô­µã×İ×ø±ê
+//å­˜å‚¨çœ¼ç›çš„ä¸Šä¸€ä¸ªç‚¹çš„åæ ‡
+int eye_pre_x = 20;			//åŸç‚¹æ¨ªåæ ‡
+int eye_pre_y = 400;			//åŸç‚¹çºµåæ ‡
 int eye_now_x = 20;	
 int eye_now_y = 400;
 int START_TIME = 0, END_TIME = 0;
-//´æ´¢Õ£ÑÛµÄ´ÎÊı
-unsigned int count_blink = 0;		//Õ£ÑÛ´ÎÊı--Ã¿´ÎÕ£ÑÛEAR¶¼Òª¾­Àú´Ó  >0.2-<0.2->0.2 µÄ¹ı³Ì
-double blink_EAR_before =0.0;		//Õ£ÑÛÇ°
-double blink_EAR_now =1.0;			//Õ£ÑÛÖĞ
-double blink_EAR_after = 0.0;		//Õ£ÑÛºó
+//å­˜å‚¨çœ¨çœ¼çš„æ¬¡æ•°
+unsigned int count_blink = 0;		//çœ¨çœ¼æ¬¡æ•°--æ¯æ¬¡çœ¨çœ¼EARéƒ½è¦ç»å†ä»  >0.2-<0.2->0.2 çš„è¿‡ç¨‹
+double blink_EAR_before =0.0;		//çœ¨çœ¼å‰
+double blink_EAR_now =1.0;		//çœ¨çœ¼ä¸­
+double blink_EAR_after = 0.0;		//çœ¨çœ¼å
 
-Mat Eye_Waveform(420, 420, CV_8UC3, Scalar(255, 255, 255));//ÓÃÓÚ¼ÇÂ¼Õ£ÑÛµÄ²¨ĞÎÍ¼--°×É«
+Mat Eye_Waveform(420, 420, CV_8UC3, Scalar(255, 255, 255));//ç”¨äºè®°å½•çœ¨çœ¼çš„æ³¢å½¢å›¾--ç™½è‰²
 
 double GetEAR(std::vector<full_object_detection> shapes) {
-	//»ñÈ¡×óÓÒÑÛµÄ6µã×ø±ê£¨¹²12¸öµã£©
-	//µã36µÄ×ø±ê
+	//è·å–å·¦å³çœ¼çš„6ç‚¹åæ ‡ï¼ˆå…±12ä¸ªç‚¹ï¼‰
+	//ç‚¹36çš„åæ ‡
 	unsigned int x_36 = shapes[0].part(36).x();
 	unsigned int y_36 = shapes[0].part(36).y();
-	//µã37µÄ×ø±ê
+	//ç‚¹37çš„åæ ‡
 	unsigned int x_37 = shapes[0].part(37).x();
 	unsigned int y_37 = shapes[0].part(37).y();
-	//µã38µÄ×ø±ê
+	//ç‚¹38çš„åæ ‡
 	unsigned int x_38 = shapes[0].part(38).x();
 	unsigned int y_38 = shapes[0].part(38).y();
-	//µã39µÄ×ø±ê
+	//ç‚¹39çš„åæ ‡
 	unsigned int x_39 = shapes[0].part(39).x();
 	unsigned int y_39 = shapes[0].part(39).y();
-	//µã40µÄ×ø±ê
+	//ç‚¹40çš„åæ ‡
 	unsigned int x_40 = shapes[0].part(40).x();
 	unsigned int y_40 = shapes[0].part(40).y();
-	//µã41µÄ×ø±ê
+	//ç‚¹41çš„åæ ‡
 	unsigned int x_41 = shapes[0].part(41).x();
 	unsigned int y_41 = shapes[0].part(41).y();
-	//µã42µÄ×ø±ê
+	//ç‚¹42çš„åæ ‡
 	unsigned int x_42 = shapes[0].part(42).x();
 	unsigned int y_42 = shapes[0].part(42).y();
-	//µã37µÄ×ø±ê---------------------------------------
+	//ç‚¹37çš„åæ ‡---------------------------------------
 	unsigned int x_43 = shapes[0].part(43).x();
 	unsigned int y_43 = shapes[0].part(43).y();
-	//µã38µÄ×ø±ê
+	//ç‚¹38çš„åæ ‡
 	unsigned int x_44 = shapes[0].part(44).x();
 	unsigned int y_44 = shapes[0].part(44).y();
-	//µã39µÄ×ø±ê
+	//ç‚¹39çš„åæ ‡
 	unsigned int x_45 = shapes[0].part(45).x();
 	unsigned int y_45 = shapes[0].part(45).y();
-	//µã40µÄ×ø±ê
+	//ç‚¹40çš„åæ ‡
 	unsigned int x_46 = shapes[0].part(46).x();
 	unsigned int y_46 = shapes[0].part(46).y();
-	//µã41µÄ×ø±ê
+	//ç‚¹41çš„åæ ‡
 	unsigned int x_47 = shapes[0].part(47).x();
 	unsigned int y_47 = shapes[0].part(47).y();
-	//¼ÆËãEAR
-	int left_h1 = y_41 - y_37;			 //37µ½41µÄ×İÏò¾àÀë
-	int left_h2 = y_40 - y_38;			 //38µ½40µÄ×İÏò¾àÀë
-	double left_h = (left_h1+left_h2) / 2.0;//ÑÛ¾¦ÉÏÏÂ¾àÀë
+	//è®¡ç®—EAR
+	int left_h1 = y_41 - y_37;			 //37åˆ°41çš„çºµå‘è·ç¦»
+	int left_h2 = y_40 - y_38;			 //38åˆ°40çš„çºµå‘è·ç¦»
+	double left_h = (left_h1+left_h2) / 2.0;//çœ¼ç›ä¸Šä¸‹è·ç¦»
 	int left_w = x_39 - x_36;
-	if (left_h == 0)left_h = 1;//µ±ÑÛ¾¦±ÕºÏµÄÊ±ºò£¬¾àÀë¿ÉÄÜ¼ì²âÎª0£¬¿í¸ß±È³ö´í
-	double left_EAR = left_h / left_w;		//ÑÛ¾¦¿í¸ß±È
+	if (left_h == 0)left_h = 1;//å½“çœ¼ç›é—­åˆçš„æ—¶å€™ï¼Œè·ç¦»å¯èƒ½æ£€æµ‹ä¸º0ï¼Œå®½é«˜æ¯”å‡ºé”™
+	double left_EAR = left_h / left_w;		//çœ¼ç›å®½é«˜æ¯”
 
-	int right_h1 = y_47 - y_43;			 //37µ½41µÄ×İÏò¾àÀë
-	int right_h2 = y_46 - y_44;			 //38µ½40µÄ×İÏò¾àÀë
-	double right_h = (right_h1 + right_h2) / 2.0;//ÑÛ¾¦ÉÏÏÂ¾àÀë
+	int right_h1 = y_47 - y_43;			 //37åˆ°41çš„çºµå‘è·ç¦»
+	int right_h2 = y_46 - y_44;			 //38åˆ°40çš„çºµå‘è·ç¦»
+	double right_h = (right_h1 + right_h2) / 2.0;//çœ¼ç›ä¸Šä¸‹è·ç¦»
 	int right_w = x_45 - x_42;
-	if (right_h == 0)right_h = 1;//µ±ÑÛ¾¦±ÕºÏµÄÊ±ºò£¬¾àÀë¿ÉÄÜ¼ì²âÎª0£¬¿í¸ß±È³ö´í
-	double right_EAR = right_h / right_w;		//ÑÛ¾¦¿í¸ß±È
+	if (right_h == 0)right_h = 1;//å½“çœ¼ç›é—­åˆçš„æ—¶å€™ï¼Œè·ç¦»å¯èƒ½æ£€æµ‹ä¸º0ï¼Œå®½é«˜æ¯”å‡ºé”™
+	double right_EAR = right_h / right_w;		//çœ¼ç›å®½é«˜æ¯”
 
-	//È¡Á½Ö»ÑÛ¾¦µÄÆ½¾ù¿í¸ß±È×÷ÎªÑÛ¾¦µÄ¿í¸ß±È
+	//å–ä¸¤åªçœ¼ç›çš„å¹³å‡å®½é«˜æ¯”ä½œä¸ºçœ¼ç›çš„å®½é«˜æ¯”
 	double EAR = (left_EAR + right_EAR) / 2.0;
 	return EAR;
 }
 
-void Draw_init() {//»­³õÊ¼×ø±êÖá
+void Draw_init() {//ç”»åˆå§‹åæ ‡è½´
 	Point p1 = Point(20, 400);
 	Point p2 = Point(20, 0);
 	Point p3 = Point(420, 400);
-	//»­Ïß
+	//ç”»çº¿
 	cv::line(Eye_Waveform, Point(20, 200), Point(420, 200), Scalar(0, 16, 219), 1, LINE_AA);
-	cv::line(Eye_Waveform, p1, p2, Scalar(219, 22, 0), 1, LINE_AA);//À¶É«µÄÏß
+	cv::line(Eye_Waveform, p1, p2, Scalar(219, 22, 0), 1, LINE_AA);//è“è‰²çš„çº¿
 	cv::line(Eye_Waveform, p1, p3, Scalar(219, 22, 0), 1, LINE_AA);
-	//×ø±ê--Ó²Ğ´ÊµÏÖ
-	cv::putText(Eye_Waveform, "0", Point(10, 410), FONT_HERSHEY_COMPLEX, 0.4, Scalar(0, 0, 0), 1);//Ô´µã
+	//åæ ‡--ç¡¬å†™å®ç°
+	cv::putText(Eye_Waveform, "0", Point(10, 410), FONT_HERSHEY_COMPLEX, 0.4, Scalar(0, 0, 0), 1);//æºç‚¹
 	cv::putText(Eye_Waveform, "0.1", Point(0, 310), FONT_HERSHEY_COMPLEX, 0.4, Scalar(0, 0, 0), 1);
 	cv::putText(Eye_Waveform, "0.2", Point(0, 210), FONT_HERSHEY_COMPLEX, 0.4, Scalar(0, 0, 0), 1);
 	cv::putText(Eye_Waveform, "0.3", Point(0, 110), FONT_HERSHEY_COMPLEX, 0.4, Scalar(0, 0, 0), 1);
 	cv::putText(Eye_Waveform, "0.4", Point(0, 10), FONT_HERSHEY_COMPLEX, 0.4, Scalar(0, 0, 0), 1);
-	//×ø±êµã
+	//åæ ‡ç‚¹
 	cv::circle(Eye_Waveform, Point(20, 400), 1, Scalar(0, 0, 0), 2);
 	cv::circle(Eye_Waveform, Point(20, 300), 1, Scalar(0, 0, 0), 2);
 	cv::circle(Eye_Waveform, Point(20, 200), 1, Scalar(0, 0, 0), 2);
 	cv::circle(Eye_Waveform, Point(20, 100), 1, Scalar(0, 0, 0), 2);
 	cv::circle(Eye_Waveform, Point(20, 0), 1, Scalar(0, 0, 0), 1);
-	//¸½¼ÓÎÄ×Ö
+	//é™„åŠ æ–‡å­—
 	cv::putText(Eye_Waveform, "Picture1", Point(200, 410), FONT_HERSHEY_COMPLEX, 0.4, Scalar(0, 0, 0), 1);
 	cv::putText(Eye_Waveform, "time", Point(380, 410), FONT_HERSHEY_COMPLEX, 0.4, Scalar(0, 0, 0), 1);
 }
 
-void Count(double EAR) {//´«Èë²ÎÊıÊÇÄ¿Ç°¼ÆËãµÃ³öµÄEAR
+void Count(double EAR) {//ä¼ å…¥å‚æ•°æ˜¯ç›®å‰è®¡ç®—å¾—å‡ºçš„EAR
 	if (blink_EAR_before < EAR)blink_EAR_before = EAR; 
 	if (blink_EAR_now > EAR)blink_EAR_now = EAR; 
 	if (blink_EAR_after < EAR)blink_EAR_after = EAR;
-	if ((blink_EAR_before > 0.2) && (blink_EAR_now <= 0.2) && (blink_EAR_after > 0.2)) {//³öÏÖµÄÎÊÌâÊÇËùÓĞµÄº¯Êı¶¼½øÈëÕâÀï
+	if ((blink_EAR_before > 0.2) && (blink_EAR_now <= 0.2) && (blink_EAR_after > 0.2)) {//å‡ºç°çš„é—®é¢˜æ˜¯æ‰€æœ‰çš„å‡½æ•°éƒ½è¿›å…¥è¿™é‡Œ
 		END_TIME = clock();
-		cout << "EAR£º" << EAR << " Ç°£º" << blink_EAR_before << " ÖĞ£º" << blink_EAR_now << " ºó£º" << blink_EAR_after << endl;
+		cout << "EARï¼š" << EAR << " å‰ï¼š" << blink_EAR_before << " ä¸­ï¼š" << blink_EAR_now << " åï¼š" << blink_EAR_after << endl;
 		blink_EAR_before = 0.0;
 		blink_EAR_now = 1.0;
 		blink_EAR_after = 0.0;
 		if ((END_TIME - START_TIME) / CLOCKS_PER_SEC * 1000 > 200)count_blink++;
 		START_TIME = clock();
 	}
-}//¡¾¶ÔÕâÀï½øĞĞÒ»¸ö¼ÆÊ±µÄ²Ù×÷¡£¡¿
+}//ã€å¯¹è¿™é‡Œè¿›è¡Œä¸€ä¸ªè®¡æ—¶çš„æ“ä½œã€‚ã€‘
 
 void Draw_now(double EAR) {
-	Count(EAR);//Ë³±ã¼ÆËãÒ»ÏÂcnt
-	eye_now_x = eye_now_x + 1;			//ºá×ø±ê£¨Ã¿10¸öÏñËØÃèÒ»¸öµã£©
-	eye_now_y = 400*(1-EAR/0.4);		//×İ×ø±ê
-	Point pos1 = Point(eye_pre_x, eye_pre_y);//ÉÏÒ»¸öµã
-	Point pos2 = Point(eye_now_x, eye_now_y);//ÏÖÔÚµÄµã
-	cv::line(Eye_Waveform, pos1, pos2, Scalar(0, 0, 0), 1, LINE_AA);//»­Ïß-ºÚÉ«
+	Count(EAR);//é¡ºä¾¿è®¡ç®—ä¸€ä¸‹cnt
+	eye_now_x = eye_now_x + 1;			//æ¨ªåæ ‡ï¼ˆæ¯10ä¸ªåƒç´ æä¸€ä¸ªç‚¹ï¼‰
+	eye_now_y = 400*(1-EAR/0.4);		//çºµåæ ‡
+	Point pos1 = Point(eye_pre_x, eye_pre_y);//ä¸Šä¸€ä¸ªç‚¹
+	Point pos2 = Point(eye_now_x, eye_now_y);//ç°åœ¨çš„ç‚¹
+	cv::line(Eye_Waveform, pos1, pos2, Scalar(0, 0, 0), 1, LINE_AA);//ç”»çº¿-é»‘è‰²
 	eye_pre_x = eye_now_x;
 	eye_pre_y = eye_now_y;
 }
@@ -144,10 +144,10 @@ string DoubleToString(double num) {
 
 int main() {
 	Draw_init();
-	//´ò¿ªÉãÏñÍ·
+	//æ‰“å¼€æ‘„åƒå¤´
 	VideoCapture cap(0);
 	if (!cap.isOpened()) {
-		cout << "¡¾ÎŞ·¨´ò¿ªÉãÏñÍ·¡¿" << endl;
+		cout << "ã€æ— æ³•æ‰“å¼€æ‘„åƒå¤´ã€‘" << endl;
 		return 1;
 	}
 
@@ -158,7 +158,7 @@ int main() {
 	while (true) {
 		Mat frame;
 		cap >> frame;
-		cv_image<bgr_pixel> cimg(frame);//½«Í¼Ïñ×ª»¯ÎªdlibÖĞµÄBGR¸ñÊ½
+		cv_image<bgr_pixel> cimg(frame);//å°†å›¾åƒè½¬åŒ–ä¸ºdlibä¸­çš„BGRæ ¼å¼
 
 		std::vector<dlib::rectangle> faces = detector(cimg);
 		std::vector<full_object_detection> shapes;
@@ -166,12 +166,12 @@ int main() {
 
 		if (!shapes.empty()) {
 			for (int j = 0; j < shapes.size(); j++) {
-				for (int i = 0; i < 68; i++) {//ÓÃÀ´»­ÌØÕ÷ÖµµÄµã
+				for (int i = 0; i < 68; i++) {//ç”¨æ¥ç”»ç‰¹å¾å€¼çš„ç‚¹
 					cv::circle(frame, cvPoint(shapes[j].part(i).x(), shapes[j].part(i).y()), 2, cv::Scalar(219,22,0), -1);
 				}
 			}
-			Draw_now(GetEAR(shapes));//»ñµÃEAR²¢×÷Îª²ÎÊı»­³öÕ£ÑÛ²¨ĞÎÍ¼
-			//°Ñhight_left_eye´ÓfloatÀàĞÍ×ª»¯³É×Ö·û´®ÀàĞÍ
+			Draw_now(GetEAR(shapes));//è·å¾—EARå¹¶ä½œä¸ºå‚æ•°ç”»å‡ºçœ¨çœ¼æ³¢å½¢å›¾
+			//æŠŠhight_left_eyeä»floatç±»å‹è½¬åŒ–æˆå­—ç¬¦ä¸²ç±»å‹
 			string count_blink_text=DoubleToString(count_blink);
 			count_blink_text = "Count:" + count_blink_text;
 			putText(frame, count_blink_text, Point(10, 100), FONT_HERSHEY_COMPLEX, 1.0, Scalar(0, 0, 0), 1, LINE_AA);
